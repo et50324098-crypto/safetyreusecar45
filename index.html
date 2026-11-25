@@ -1,0 +1,1419 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23059669' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClearExport (클리어익스포트) — 한국 중고차 수출 환경·안전 인증 플랫폼</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7',
+                400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857',
+                800: '#065f46', 900: '#064e3b',
+              },
+              navy: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' }
+            },
+            fontFamily: {
+              sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+    <style>
+      html {
+        scroll-behavior: smooth;
+        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      }
+      .fade-in {
+        animation: fadeIn 0.25s ease-out forwards;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @media print {
+        body * { visibility: hidden; }
+        #printable-green-passport, #printable-green-passport * { visibility: visible; }
+        #printable-green-passport {
+          position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 20px;
+          box-shadow: none !important; border: 1px solid #cbd5e1 !important;
+        }
+        .no-print { display: none !important; }
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50 text-slate-800 antialiased selection:bg-emerald-100 selection:text-emerald-900">
+    <div id="app"></div>
+
+    <script>
+      const translations = {
+        ko: {
+          'nav.issue': '오염 전가 문제의식', 'nav.issue_sub': 'Issue',
+          'nav.checker': '수출 규제 자가진단', 'nav.checker_sub': 'Checker',
+          'nav.showcase': '그린 패스포트 인증매물', 'nav.showcase_sub': 'Showcase',
+          'nav.sdgs': 'SDGs 가치', 'nav.sdgs_sub': 'Impact',
+          'nav.cta': '적합성 자가진단',
+          'nav.subtitle': '클리어익스포트 · 한국 수출 중고차 환경·안전 투명화 플랫폼',
+
+          'hero.badge': 'K-Used Car Responsible Trade Initiative',
+          'hero.sub_badge': '공익·ESG 무역 솔루션',
+          'hero.title': '어디로, 어떤 차가 떠나는가?',
+          'hero.subtitle': '한국 수출 중고차의 환경·안전 이력 투명화 플랫폼',
+          'hero.desc': '인천항을 통해 연간 74만 대의 중고차가 전 세계로 떠납니다. ClearExport는 수입국의 환경 규제 부합 여부와 실차 안전 이력을 투명하게 사전 검증하여 개도국 ‘그린 덤핑(오염 전가)’과 ‘탄소 누출(Carbon Leakage)’을 원천 예방합니다.',
+          'hero.cta_checker': '수출 규제 자가진단 시작하기',
+          'hero.cta_showcase': 'K-Certified 그린 패스포트 매물 보기',
+          'hero.stat1_title': '2025 대한민국 수출액', 'hero.stat1_val': '88.7억', 'hero.stat1_unit': '달러 ($)', 'hero.stat1_sub': '역대 최고 수출 실적 달성',
+          'hero.stat2_title': '인천항 연간 수출 물량', 'hero.stat2_val': '742,199', 'hero.stat2_unit': '대', 'hero.stat2_sub': '국내 중고차 수출의 약 80%',
+          'hero.stat3_title': '노후 경유차 비중 추산', 'hero.stat3_val': '40% 초과', 'hero.stat3_sub': 'DPF 미정비·배출 4~5등급 포함',
+          'hero.stat4_title': '주요 수입국 규제 매핑', 'hero.stat4_val': '5대 권역', 'hero.stat4_unit': '실시간', 'hero.stat4_sub': 'EAC · 몽골 · 리비아 · 캄보디아 · 칠레',
+
+          'prob.badge': 'Crisis & Problem Awareness',
+          'prob.title': '화려한 수출 실적 이면의 ‘오염 전가’와 ‘탄소 누출’',
+          'prob.desc': '국내에서 환경 규제로 설 자리를 잃은 노후차량이 환경 감시망이 느슨한 개발도상국으로 떠밀려 가고 있습니다.',
+          'prob.card1_badge': '문제 01 · 규제 회피',
+          'prob.card1_title': "국내 퇴출 노후 디젤차의 '그린 덤핑'",
+          'prob.card1_desc': '국내 운행제한 대상인 4·5등급 노후 경유차와 DPF가 탈거·고장난 화물 트럭이 수출이라는 명목하에 규제 장벽이 낮은 아프리카·중앙아시아 등지로 무방비 이전되고 있습니다.',
+          'prob.card2_badge': '문제 02 · 탄소 누출',
+          'prob.card2_title': '지구 반대편의 초미세먼지와 탄소 누출',
+          'prob.card2_desc': '한국의 국가 탄소 인벤토리에서는 사라지지만, 수입국 울란바토르나 나이로비 상공에 대량의 블랙카본(Black Carbon)과 질소산화물을 뿜어내어 전 지구적 기후위기와 호흡기 질환을 가중시킵니다.',
+          'prob.card3_badge': '문제 03 · 바이어 리스크',
+          'prob.card3_title': '수입국 규제 강화로 인한 통관 거부 및 신인도 하락',
+          'prob.card3_desc': '개도국들도 동아프리카 EURO 4 의무화, 연식 8년 제한 등 환경 기준을 급격히 높이고 있습니다. 사전 검증 없는 무리한 선적은 항만 억류, 반송 폐기 및 K-중고차 전체의 신뢰 훼손으로 직결됩니다.',
+
+          'checker.badge': 'Interactive Compliance Matcher',
+          'checker.title': '수출 차량 자가진단 & 수입국 환경 규제 매칭기',
+          'checker.desc': '차량 번호 없이도 연식, 유종, 배출가스 등급, DPF 상태만으로 5개 주요 수입국의 최신 환경·안전 법규 적합성을 즉시 판정합니다. 그린 덤핑 위험을 사전에 방지하세요.',
+          'checker.presets': '빠른 예시 시뮬레이션:',
+          'checker.preset1': '🚚 2018 포터 II (경유 3등급 + DPF)',
+          'checker.preset2': '⚠️ 2008 노후 경유차 (5등급 미저감)',
+          'checker.preset3': '🌱 2021 친환경/EV (1등급)',
+          'checker.form_title': '차량 스펙 및 목표 국가 설정',
+          'checker.year_label': '1. 차량 연식 선택 (Manufacture Year)',
+          'checker.year_sub': '수입국별 연식 상한 규제 적용',
+          'checker.fuel_label': '2. 유종 선택 (Fuel Type)',
+          'checker.grade_label': '3. 국내 배출가스 등급 (Korea Emission Grade)',
+          'checker.grade_sub': '환경부 자동차 배출가스 종합전산망 기준',
+          'checker.dpf_label': '4. DPF(매연저감장치) 및 정비 상태 (DPF & Maintenance Status)',
+          'checker.country_label': '5. 목표 수출 국가 선택 (Target Destination)',
+          'checker.submit': '수출 적합성 진단하기 (Evaluate Compliance)',
+          'checker.preview_passport': '가상 그린 패스포트 미리보기 생성 (View Passport)',
+          'checker.preview_passport_desc': '입력하신 스펙이 반영된 디지털 환경·안전 인증서를 즉시 발급·미리보기합니다.',
+
+          'showcase.badge': 'K-Certified Clean Vehicles Registry',
+          'showcase.title': '책임 수출 인증 차량 쇼케이스',
+          'showcase.desc': '인천항 출항 전 배출가스 정밀 검사와 안전 정비를 마친 ‘디지털 그린 패스포트’ 발급 매물입니다. 해외 바이어는 통관 리스크 없이 투명하게 검증된 차량을 확인하고 직거래할 수 있습니다.',
+          'showcase.tab_all': '전체 매물 (All)',
+          'showcase.tab_suv': 'SUV · 승용',
+          'showcase.tab_comm': '상용 · 트럭 (포터/봉고 등)',
+          'showcase.tab_eco': '친환경 · 하이브리드 / EV',
+          'showcase.search_ph': '차종명, 인증번호, 차대번호 검색',
+          'showcase.country_filter': '수입 추천 국가 필터:',
+          'showcase.all_countries': '전체 국가',
+          'showcase.view_passport': '그린 패스포트(환경인증서) 보기',
+          'showcase.empty': '검색 조건에 일치하는 인증 매물이 없습니다.',
+          'showcase.reset_filter': '필터 초기화',
+
+          'modal.official_title': '공식 디지털 그린 패스포트 (Official Certificate)',
+          'modal.virtual_title': '가상 발급 시뮬레이션 미리보기 (Virtual Preview)',
+          'modal.view_eval': '평가 기준표 바로보기',
+          'modal.print': '인증서 PDF 인쇄 / 저장',
+          'modal.close': '닫기',
+          'modal.qr_open_eval': "🔍 스캔 시 열리는 '평가 기준표' 바로보기",
+          'modal.footer_note': '* 스마트폰 카메라로 QR 코드를 비추면 즉시 진위 검증 및 환경·안전 평가 기준표가 표시됩니다.',
+
+          'sdgs.badge': 'UN Sustainable Development Goals (SDGs)',
+          'sdgs.title': 'ClearExport가 창출하는 3대 공익 ESG 임팩트',
+          'sdgs.desc': '단순 중고차 유통을 넘어, 대한민국과 수입국 간의 지속가능한 자원순환과 호흡기 건강권을 지키는 글로벌 ESG 표준을 실천합니다.',
+          'sdgs.collab_title': '글로벌 무역 투명화 & 공익 거버넌스 협력 체계',
+          'sdgs.collab_desc': '인천항만공사 수출단지 · 환경부 자동차 배출가스 전산망 · 동아프리카 표준국(KEBS/UNBS) 연계 지향',
+          'sdgs.copyright': 'ClearExport Initiative. All rights reserved. 투명한 중고차 수출로 개발도상국 대기 환경과 글로벌 기후정의를 실현합니다.'
+        },
+        en: {
+          'nav.issue': 'Green Dumping Crisis', 'nav.issue_sub': 'Issue',
+          'nav.checker': 'Compliance Checker', 'nav.checker_sub': 'Checker',
+          'nav.showcase': 'Certified Showcase', 'nav.showcase_sub': 'Showcase',
+          'nav.sdgs': 'SDGs Impact', 'nav.sdgs_sub': 'Impact',
+          'nav.cta': 'Check Compliance',
+          'nav.subtitle': 'ClearExport · Korea Export Used Vehicle Environmental & Safety Transparency Platform',
+
+          'hero.badge': 'K-Used Car Responsible Trade Initiative',
+          'hero.sub_badge': 'Public-Interest ESG Trade Solution',
+          'hero.title': 'Where and which cars are leaving?',
+          'hero.subtitle': 'Korea Export Used Vehicle Environmental & Safety Verification Platform',
+          'hero.desc': 'Over 740,000 used vehicles depart annually through the Port of Incheon. ClearExport verifies target countries’ environmental regulations and real vehicle safety history in advance, fundamentally preventing "Green Dumping" and "Carbon Leakage" to developing nations.',
+          'hero.cta_checker': 'Start Compliance Diagnosis',
+          'hero.cta_showcase': 'Explore K-Certified Green Passports',
+          'hero.stat1_title': '2025 Korea Total Export', 'hero.stat1_val': '$8.87B', 'hero.stat1_unit': 'USD', 'hero.stat1_sub': 'All-Time Record High Export Volume',
+          'hero.stat2_title': 'Incheon Port Annual Volume', 'hero.stat2_val': '742,199', 'hero.stat2_unit': 'Units', 'hero.stat2_sub': 'Approx. 80% of National Export Volume',
+          'hero.stat3_title': 'Estimated Aged Diesel Share', 'hero.stat3_val': 'Over 40%', 'hero.stat3_sub': 'Includes DPF-unverified & Grade 4~5',
+          'hero.stat4_title': 'Target Regulations Mapped', 'hero.stat4_val': '5 Regions', 'hero.stat4_unit': 'Live Matrix', 'hero.stat4_sub': 'EAC · Mongolia · Libya · Cambodia · Chile',
+
+          'prob.badge': 'Crisis & Problem Awareness',
+          'prob.title': 'The Hidden Reality of "Green Dumping" and "Carbon Leakage"',
+          'prob.desc': 'Aged diesel vehicles restricted in Korea due to tightening domestic standards are being displaced to developing countries with vulnerable environmental oversight.',
+          'prob.card1_badge': 'Issue 01 · Regulatory Evasion',
+          'prob.card1_title': '"Green Dumping" of Domestic Restricted Diesels',
+          'prob.card1_desc': 'Aged 4th & 5th emission grade diesels and commercial trucks with degraded DPF filters are exported without oversight to Africa and Central Asia where import barriers remain low.',
+          'prob.card2_badge': 'Issue 02 · Carbon Leakage',
+          'prob.card2_title': 'Deadly Smog & Carbon Leakage in Global South',
+          'prob.card2_desc': 'While removed from Korea’s domestic carbon tally, these vehicles discharge massive black carbon and NOx across cities like Ulaanbaatar and Nairobi, accelerating global climate risks and respiratory illnesses.',
+          'prob.card3_badge': 'Issue 03 · Buyer Risk',
+          'prob.card3_title': 'Customs Rejection & Loss of Buyer Trust',
+          'prob.card3_desc': 'Importing nations are raising standards (e.g. East Africa EAC EURO 4 mandate, 8-year age caps). Unverified shipments result in border impoundment, scrap penalties, and erosion of K-used car credibility.',
+
+          'checker.badge': 'Interactive Compliance Matcher',
+          'checker.title': 'Vehicle Self-Diagnosis & Import Country Regulatory Matcher',
+          'checker.desc': 'Diagnose real-time regulatory compliance across 5 major export destinations without entering plate numbers. Prevent green dumping risks and ensure seamless port customs clearance.',
+          'checker.presets': 'Quick Scenario Simulations:',
+          'checker.preset1': '🚚 2018 Porter II (Diesel Grade 3 + DPF)',
+          'checker.preset2': '⚠️ 2008 Aged Diesel (Grade 5 Non-Retrofit)',
+          'checker.preset3': '🌱 2021 Eco / EV (Grade 1)',
+          'checker.form_title': 'Vehicle Specifications & Target Country',
+          'checker.year_label': '1. Vehicle Manufacture Year',
+          'checker.year_sub': 'Target country age caps applied',
+          'checker.fuel_label': '2. Fuel Type',
+          'checker.grade_label': '3. Korea Domestic Emission Grade',
+          'checker.grade_sub': 'Ministry of Environment Clean Air Network',
+          'checker.dpf_label': '4. DPF (Diesel Particulate Filter) & Maintenance Status',
+          'checker.country_label': '5. Target Destination Country',
+          'checker.submit': 'Evaluate Compliance Now',
+          'checker.preview_passport': 'Generate Virtual Green Passport (Preview)',
+          'checker.preview_passport_desc': 'Immediately issues and displays a temporary digital passport reflecting your entered specs.',
+
+          'showcase.badge': 'K-Certified Clean Vehicles Registry',
+          'showcase.title': 'Responsible Export Certified Vehicles Showcase',
+          'showcase.desc': 'Verified vehicles issued official "Digital Green Passports" upon passing rigorous emissions testing and safety overhauls at Incheon Port. Overseas buyers can trade transparently with zero customs risk.',
+          'showcase.tab_all': 'All Vehicles',
+          'showcase.tab_suv': 'SUV & Sedans',
+          'showcase.tab_comm': 'Commercial & Trucks (Porter/Bongo)',
+          'showcase.tab_eco': 'Eco, Hybrid & Electric',
+          'showcase.search_ph': 'Search model, cert ID, masked VIN',
+          'showcase.country_filter': 'Eligible Destination Filter:',
+          'showcase.all_countries': 'All Countries',
+          'showcase.view_passport': 'View Green Passport (Certificate)',
+          'showcase.empty': 'No certified vehicles match the selected criteria.',
+          'showcase.reset_filter': 'Reset Filters',
+
+          'modal.official_title': 'Official Digital Green Passport (Certificate)',
+          'modal.virtual_title': 'Virtual Diagnostic Simulation (Preview)',
+          'modal.view_eval': 'View Evaluation Criteria',
+          'modal.print': 'Print / Save as PDF',
+          'modal.close': 'Close',
+          'modal.qr_open_eval': "🔍 Direct Preview: Scanned Evaluation Sheet",
+          'modal.footer_note': '* Point your smartphone camera at the QR code to verify authenticity and view real-time environmental/safety evaluation standards.',
+
+          'sdgs.badge': 'UN Sustainable Development Goals (SDGs)',
+          'sdgs.title': '3 Core ESG Public-Interest Impacts by ClearExport',
+          'sdgs.desc': 'Going beyond transactional trade, we uphold global ESG principles ensuring circular resource reuse and protecting respiratory health rights in partner nations.',
+          'sdgs.collab_title': 'Global Trade Transparency & Public Governance Ecosystem',
+          'sdgs.collab_desc': 'Incheon Port Authority · Ministry of Environment Automotive DB · East African Bureau of Standards (KEBS/UNBS) Alignment',
+          'sdgs.copyright': 'ClearExport Initiative. All rights reserved. Realizing climate justice and clean air across developing nations through transparent used vehicle trade.'
+        }
+      };
+
+      const TARGET_COUNTRIES = [
+        {
+          id: 'kenya_uganda', name: '케냐 · 우간다 (동아프리카공동체 EAC)', nameEn: 'Kenya & Uganda (EAC)', flag: '🇰🇪 🇺🇬',
+          description: 'EAC 통합 기준 EURO 4 배출가스 및 엄격한 차량 연식 제한(케냐 최대 8년 이내)을 적용하며 사전적격성평가(PVoC) 필수 국가입니다.',
+          emissionStandard: 'EURO 4 이상 필수', ageLimitText: '최대 8년 이내 (2018년 이후 권장)'
+        },
+        {
+          id: 'mongolia', name: '몽골 (울란바토르)', nameEn: 'Mongolia (Ulaanbaatar)', flag: '🇲🇳',
+          description: '한국과 동일한 좌핸들 주행 국가로 한국산 중고차 선호도가 매우 높으나, 극심한 동절기 대기오염으로 노후 경유차 매연 검사가 대폭 강화되었습니다.',
+          emissionStandard: '매연 측정치 15% 이하 및 DPF 권고', ageLimitText: '연식 제한 완화(수입세 차등 적용)'
+        },
+        {
+          id: 'libya', name: '리비아 (트리폴리·미스라타)', nameEn: 'Libya (Tripoli & Misrata)', flag: '🇱🇾',
+          description: '한국 중고차 단일 국가 수출 물량 최상위권(연 10만대 이상). 사막·고온 기후로 인해 엔진 냉각계통, 에어컨, 브레이크 안전 제동력 사전 점검이 결정적입니다.',
+          emissionStandard: '기본 안전·배출 기준 및 연식 세제', ageLimitText: '연식 10년 이하 권장'
+        },
+        {
+          id: 'cambodia', name: '캄보디아 (프놈펜·시아누크빌)', nameEn: 'Cambodia (Phnom Penh)', flag: '🇰🇭',
+          description: '중고차 수입 관세율이 높고 연식 및 배기량별 차등 세제가 적용되며, 최근 수도권 배출가스 검사 제도 신설로 친환경·양호 차량 수요 급증.',
+          emissionStandard: 'EURO 3~4 상당 및 유독가스 검사', ageLimitText: '차등 관세 적용 (신차급 세제 혜택)'
+        },
+        {
+          id: 'chile', name: '칠레 (이키케 면세특구)', nameEn: 'Chile (ZOFRI Iquique)', flag: '🇨🇱',
+          description: 'OECD 회원국 수준의 엄격한 남미 환경·안전 기술표준(3TX 등) 및 배출가스 규제를 적용하는 고품질 중고차 수입 거점입니다.',
+          emissionStandard: 'EURO 5/6 준수 (매우 엄격)', ageLimitText: '엄격한 연식 및 배출가스 등급 적용'
+        }
+      ];
+
+      const SAMPLE_VEHICLES = [
+        {
+          id: 'veh-01', name: '현대 포터 II 슈퍼캡 초장축', nameEn: 'Hyundai Porter II Super Cab',
+          modelCode: 'HR-2018-D3', category: 'commercial', year: 2018, fuelType: 'diesel',
+          fuelTypeName: '경유 (Diesel)', emissionGrade: 3, hasDPF: true, mileageKm: 98450, priceUsd: 7800,
+          vinMasked: 'KMHD351B***98214', certNumber: 'CE-KR-2026-0841', inspectionDate: '2026-03-14',
+          imageUrl: 'images/porter2.jpg', recommendedCountries: ['mongolia', 'libya', 'cambodia'],
+          smokePM: 6.2, nox: 0.28
+        },
+        {
+          id: 'veh-02', name: '기아 더 뉴 쏘렌토 2.0 디젤 4WD', nameEn: 'Kia The New Sorento 2.0 CRDi 4WD',
+          modelCode: 'UM-2019-D3', category: 'suv_sedan', year: 2019, fuelType: 'diesel',
+          fuelTypeName: '경유 (Diesel)', emissionGrade: 3, hasDPF: true, mileageKm: 82100, priceUsd: 14200,
+          vinMasked: 'KNAPU81A***73109', certNumber: 'CE-KR-2026-0912', inspectionDate: '2026-03-12',
+          imageUrl: 'images/sorento.jpg', recommendedCountries: ['kenya_uganda', 'mongolia', 'libya', 'cambodia'],
+          smokePM: 4.8, nox: 0.19
+        },
+        {
+          id: 'veh-03', name: '현대 아반떼 AD 1.6 가솔린 스마트', nameEn: 'Hyundai Avante (Elantra) AD 1.6 GDi',
+          modelCode: 'AD-2017-G2', category: 'suv_sedan', year: 2017, fuelType: 'gasoline',
+          fuelTypeName: '휘발유 (Gasoline)', emissionGrade: 2, hasDPF: false, mileageKm: 76300, priceUsd: 8300,
+          vinMasked: 'KMHD841C***44081', certNumber: 'CE-KR-2026-1045', inspectionDate: '2026-03-10',
+          imageUrl: 'images/avante_ad.jpg', recommendedCountries: ['libya', 'cambodia', 'mongolia'],
+          smokePM: 0.4, nox: 0.08
+        },
+        {
+          id: 'veh-04', name: '현대 아이오닉 하이브리드 Q', nameEn: 'Hyundai Ioniq Hybrid (Eco K-Certified)',
+          modelCode: 'AE-2020-H1', category: 'eco', year: 2020, fuelType: 'eco',
+          fuelTypeName: '하이브리드 (HEV)', emissionGrade: 1, hasDPF: false, mileageKm: 54100, priceUsd: 13900,
+          vinMasked: 'KMHC351L***89332', certNumber: 'CE-KR-2026-1209', inspectionDate: '2026-03-08',
+          imageUrl: 'images/ioniq.jpg', recommendedCountries: ['kenya_uganda', 'chile', 'cambodia', 'mongolia'],
+          smokePM: 0.1, nox: 0.02
+        },
+        {
+          id: 'veh-05', name: '기아 봉고 III 1톤 킹캡 CRDi', nameEn: 'Kia Bongo III 1-Ton King Cab',
+          modelCode: 'PU-2016-D3', category: 'commercial', year: 2016, fuelType: 'diesel',
+          fuelTypeName: '경유 (Diesel)', emissionGrade: 3, hasDPF: true, mileageKm: 114000, priceUsd: 6900,
+          vinMasked: 'KNCS481A***11902', certNumber: 'CE-KR-2026-0683', inspectionDate: '2026-03-05',
+          imageUrl: 'images/bongo3.jpg', recommendedCountries: ['mongolia', 'libya'],
+          smokePM: 8.5, nox: 0.32
+        },
+        {
+          id: 'veh-06', name: '현대 그랜드 스타렉스 12인승 디젤', nameEn: 'Hyundai Grand Starex 12-Seater Van',
+          modelCode: 'TQ-2018-D3', category: 'commercial', year: 2018, fuelType: 'diesel',
+          fuelTypeName: '경유 (Diesel)', emissionGrade: 3, hasDPF: true, mileageKm: 109200, priceUsd: 11500,
+          vinMasked: 'KMJWA37K***55291', certNumber: 'CE-KR-2026-1184', inspectionDate: '2026-03-02',
+          imageUrl: 'images/starex.jpg', recommendedCountries: ['kenya_uganda', 'libya', 'cambodia'],
+          smokePM: 5.9, nox: 0.24
+        },
+        {
+          id: 'veh-07', name: '제네시스 G80 3.3 GDi 럭셔리', nameEn: 'Genesis G80 3.3 GDi Premium Sedan',
+          modelCode: 'DH-2018-G2', category: 'suv_sedan', year: 2018, fuelType: 'gasoline',
+          fuelTypeName: '휘발유 (Gasoline)', emissionGrade: 2, hasDPF: false, mileageKm: 67500, priceUsd: 18900,
+          vinMasked: 'KMHH841B***21980', certNumber: 'CE-KR-2026-1350', inspectionDate: '2026-02-28',
+          imageUrl: 'images/genesis_g80.jpg', recommendedCountries: ['chile', 'libya', 'cambodia', 'mongolia'],
+          smokePM: 0.3, nox: 0.06
+        },
+        {
+          id: 'veh-08', name: '기아 니로 EV 프레스티지 64kWh', nameEn: 'Kia Niro EV (Full Electric 64kWh)',
+          modelCode: 'DE-2021-EV1', category: 'eco', year: 2021, fuelType: 'eco',
+          fuelTypeName: '전기 (Pure EV)', emissionGrade: 1, hasDPF: false, mileageKm: 41200, priceUsd: 19800,
+          vinMasked: 'KNAC381F***90144', certNumber: 'CE-KR-2026-1520', inspectionDate: '2026-02-25',
+          imageUrl: 'images/niro_ev.jpg', recommendedCountries: ['kenya_uganda', 'chile', 'cambodia', 'mongolia', 'libya'],
+          smokePM: 0.0, nox: 0.0
+        }
+      ];
+
+      const SDG_DETAILS = [
+        {
+          sdgNum: 'SDG 12', name: '책임 있는 소비와 생산', nameEn: 'Responsible Consumption and Production',
+          target: '세부목표 12.4 & 12.5', color: 'bg-amber-600', icon: 'recycle',
+          badge: '오염물질 이동 규제 및 책임 재사용',
+          description: '국내 단속으로 밀려난 노후 오염차를 개도국에 무단 이전(그린 덤핑)하는 행위를 사전에 차단하고, 엄격한 정비를 거친 차량만 선별 수출하여 안전한 자원 재사용을 확립합니다.'
+        },
+        {
+          sdgNum: 'SDG 13', name: '기후변화 대응', nameEn: 'Climate Action',
+          target: '탄소 누출(Carbon Leakage) 원천 방지', color: 'bg-emerald-600', icon: 'globe',
+          badge: '글로벌 온실가스·블랙카본 감축',
+          description: '수출 시점의 배출가스 검증 및 고효율·친환경 차량 수출 전환을 유도하여, 개도국으로 전가되던 수십만 톤의 블랙카본과 온실가스 배출을 글로벌 차원에서 억제합니다.'
+        },
+        {
+          sdgNum: 'SDG 3', name: '건강과 웰빙', nameEn: 'Good Health and Well-being',
+          target: '세부목표 3.9 대기오염 및 교통사고 감축', color: 'bg-rose-600', icon: 'heart-pulse',
+          badge: '대기질 개선 & 보행자·탑승자 생명 보호',
+          description: '수입국 도심의 초미세먼지(PM2.5) 호흡기 질환을 예방하고, 브레이크·조향 등 핵심 안전계통의 사전 정밀 점검을 통해 현지 도로의 치명적 교통사고를 방지합니다.'
+        }
+      ];
+
+      const state = {
+        lang: localStorage.getItem('clearexport_lang') === 'en' ? 'en' : 'ko',
+        mobileMenuOpen: false,
+        yearRange: '2016_2020',
+        fuelType: 'diesel',
+        emissionGrade: 3,
+        dpfStatus: 'installed_inspected',
+        targetCountryId: 'kenya_uganda',
+        diagnosisResult: null,
+        activeCategory: 'all',
+        selectedCountryFilter: 'all',
+        searchQuery: '',
+        selectedVehicle: null,
+        virtualPreviewData: null,
+        showEvaluationModal: false,
+        evalCertNumber: 'CE-KR-2026-0841'
+      };
+
+      function t(key) {
+        return translations[state.lang][key] || key;
+      }
+
+      function evaluateCompliance(input) {
+        const country = TARGET_COUNTRIES.find(c => c.id === input.targetCountryId) || TARGET_COUNTRIES[0];
+        const { yearRange, fuelType, emissionGrade, dpfStatus } = input;
+        let score = 100;
+        const keyReasons = [];
+        const recommendations = [];
+
+        const isGrade5 = emissionGrade === 5;
+        const hasNoDpf = dpfStatus === 'stock_none' || dpfStatus === 'unverified';
+
+        if (emissionGrade === 5) {
+          score -= 60;
+          keyReasons.push('국내 배출가스 5등급(노후경유차)으로 고농도 미세먼지 및 질소산화물 다량 배출 위험');
+        } else if (emissionGrade === 4) {
+          score -= 30;
+          keyReasons.push('국내 배출가스 4등급 차량으로 주요 수입국 배출 규제 경계선에 위치');
+        } else if (emissionGrade === 3) {
+          score -= 10;
+        }
+
+        if (country.id === 'kenya_uganda') {
+          if (yearRange === '2010_before' || yearRange === '2011_2015') {
+            score -= 50;
+            keyReasons.push('동아프리카공동체(EAC) 8년 연식 상한선 위반 (2018년 이전 제작 차량 통관 거부 위험)');
+          }
+          if (emissionGrade >= 4) {
+            score -= 30;
+            keyReasons.push('EAC EURO 4 배출 기준 미달 (4~5등급 차량 수입 불허 대상)');
+          }
+        } else if (country.id === 'chile') {
+          if (emissionGrade >= 3 && fuelType === 'diesel') {
+            score -= 40;
+            keyReasons.push('칠레 남미 환경기준(EURO 5/6 준수 의무) 대비 디젤 배출가스 정화장치 부족 우려');
+          }
+          if (yearRange === '2010_before') {
+            score -= 40;
+            keyReasons.push('칠레 기술표준원(3TX) 노후 차량 안전·환경 인증 통과 불가');
+          }
+        } else if (country.id === 'mongolia') {
+          if (fuelType === 'diesel' && hasNoDpf) {
+            score -= 35;
+            keyReasons.push('울란바토르 동절기 분진 집중 단속 대상 (DPF 미부착 경유차 매연 기준 초과)');
+          }
+        } else if (country.id === 'libya') {
+          if (dpfStatus === 'unverified') {
+            score -= 20;
+            keyReasons.push('냉각계통 및 오일류, 안전 부품 정비 상태 미확인으로 사막 기후 고장 리스크 존재');
+          }
+        }
+
+        if (fuelType === 'diesel') {
+          if (dpfStatus === 'stock_none') {
+            score -= 25;
+            keyReasons.push('경유차량 필수 저감장치(DPF) 미장착 상태로 현지 대기질 직접 악화');
+          } else if (dpfStatus === 'unverified') {
+            score -= 20;
+            keyReasons.push('배출가스 저감장치 및 주요 안전계통 검증 이력 부재');
+          }
+        }
+
+        let status, statusTitle, statusTitleEn, summary, summaryEn;
+
+        if (isGrade5 || score < 50 || (country.id === 'kenya_uganda' && yearRange === '2010_before')) {
+          status = 'FAIL';
+          statusTitle = '수출 부적합 (그린 덤핑 위험 경고)';
+          statusTitleEn = 'High Risk of Green Dumping (Export Non-Compliant)';
+          summary = `${country.name}의 환경·연식 규제 기준에 현저히 미달하며, 현지 대기오염 악화 및 통관 거부·반송 위험이 매우 높습니다. 조기 폐차 정부 지원금 신청 또는 국내 성능 복원 후 재심사가 요구됩니다.`;
+          summaryEn = `Critically non-compliant with ${country.nameEn} environmental and age standards. High risk of customs rejection and carbon/pollution leakage.`;
+          recommendations.push('국내 조기 폐차 보조금 대상 여부 확인 및 친환경 자원순환 처리 권고');
+          recommendations.push('수출 강행 시 관세청 통관 거부 및 바이어 클레임 손실 위험');
+          recommendations.push('DPF 공식 인증품 신규 장착 및 종합 성능검사 재진단 필수');
+        } else if (score < 80 || (fuelType === 'diesel' && hasNoDpf) || emissionGrade === 4) {
+          status = 'CONDITIONAL';
+          statusTitle = '조건부 적합 (정비·저감조치 권고)';
+          statusTitleEn = 'Conditional Clearance (Maintenance & Retrofit Advised)';
+          summary = `목표 수입국 통관은 가능할 수 있으나, 배출가스 또는 주요 안전 부품의 노후화로 인해 현지 대기오염 및 안전 리스크가 잔존합니다. 선적 전 DPF 클리닝 및 안전 정비 후 인증서 발급을 강력 권장합니다.`;
+          summaryEn = `Border clearance may be accepted, but vehicle poses moderate environmental and safety risks. DPF maintenance, brake, and tire overhaul strongly advised before export.`;
+          recommendations.push('선적 전 공식 지정 정비소에서 DPF 차압 점검 및 필터 클리닝 완료');
+          recommendations.push('브레이크 패드 마모도 및 브레이크액 비등점 검사로 안전성 보강');
+          recommendations.push('현지 바이어에게 사전 정비 이력서(Green Maintenance Report) 첨부 제공');
+        } else {
+          status = 'PASS';
+          statusTitle = '수출 적합 (Clear to Export)';
+          statusTitleEn = 'Clear to Export (K-Certified Ready)';
+          summary = `${country.name}의 최신 환경 배출 기준 및 안전 규제를 충족합니다. 바이어에게 투명한 신뢰를 제공하는 'ClearExport 디지털 그린 패스포트' 발급 대상입니다.`;
+          summaryEn = `Fully compliant with ${country.nameEn} environmental and safety standards. Eligible for official ClearExport Digital Green Passport.`;
+          recommendations.push('ClearExport 공인 디지털 그린 패스포트 발급 및 QR 검증 코드 생성');
+          recommendations.push('선적 서류(B/L)에 ESG 환경 적합 인증서 번호 명기');
+          recommendations.push('인천항 수출 야적장 안전 점검 완료 스티커 부착');
+        }
+
+        return {
+          status, statusTitle, statusTitleEn, summary, summaryEn, country,
+          score: Math.max(10, Math.min(100, score)),
+          keyReasons, recommendations
+        };
+      }
+
+      function renderNavbar() {
+        return `
+          <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 transition-all shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div class="flex items-center justify-between h-20">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+                  <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 ring-2 ring-emerald-500/30">
+                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-2xl font-black tracking-tight text-slate-900">Clear<span class="text-emerald-600">Export</span></span>
+                      <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-emerald-100 text-emerald-800 rounded-full border border-emerald-300">ESG B2B Trade</span>
+                    </div>
+                    <p class="text-xs text-slate-500 font-medium tracking-tight">${t('nav.subtitle')}</p>
+                  </div>
+                </div>
+
+                <nav class="hidden lg:flex items-center gap-7">
+                  <button onclick="scrollToSection('problem-section')" class="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i>
+                    <span>${t('nav.issue')}</span>
+                    <span class="text-[11px] text-slate-400 font-normal">${t('nav.issue_sub')}</span>
+                  </button>
+                  <button onclick="scrollToSection('compliance-section')" class="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="globe-2" class="w-4 h-4 text-emerald-600"></i>
+                    <span>${t('nav.checker')}</span>
+                    <span class="text-[11px] text-slate-400 font-normal">${t('nav.checker_sub')}</span>
+                  </button>
+                  <button onclick="scrollToSection('showcase-section')" class="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="file-check-2" class="w-4 h-4 text-teal-600"></i>
+                    <span>${t('nav.showcase')}</span>
+                    <span class="text-[11px] text-slate-400 font-normal">${t('nav.showcase_sub')}</span>
+                  </button>
+                  <button onclick="scrollToSection('sdgs-section')" class="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors cursor-pointer">
+                    <span>${t('nav.sdgs')}</span>
+                    <span class="text-[11px] text-slate-400 font-normal ml-1">${t('nav.sdgs_sub')}</span>
+                  </button>
+                </nav>
+
+                <div class="hidden md:flex items-center gap-3">
+                  <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                    <button onclick="setLanguage('ko')" class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${state.lang === 'ko' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}">한국어</button>
+                    <button onclick="setLanguage('en')" class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${state.lang === 'en' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}">English</button>
+                  </div>
+                  <button onclick="scrollToSection('compliance-section')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm shadow-sm transition-all cursor-pointer">
+                    <span>${t('nav.cta')}</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                  </button>
+                </div>
+
+                <div class="flex md:hidden items-center gap-2">
+                  <button onclick="setLanguage('${state.lang === 'ko' ? 'en' : 'ko'}')" class="p-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1 bg-slate-50">
+                    <i data-lucide="languages" class="w-4 h-4 text-emerald-600"></i>
+                    <span>${state.lang === 'ko' ? 'EN' : 'KR'}</span>
+                  </button>
+                  <button onclick="toggleMobileMenu()" class="p-2 rounded-lg text-slate-600 hover:bg-slate-100">
+                    <i data-lucide="${state.mobileMenuOpen ? 'x' : 'menu'}" class="w-6 h-6"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            ${state.mobileMenuOpen ? `
+              <div class="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-5 space-y-3 fade-in">
+                <button onclick="scrollToSection('problem-section')" class="w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-slate-50 flex items-center justify-between">
+                  <span>${t('nav.issue')}</span><i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i>
+                </button>
+                <button onclick="scrollToSection('compliance-section')" class="w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-slate-50 flex items-center justify-between">
+                  <span>${t('nav.checker')}</span><i data-lucide="globe-2" class="w-4 h-4 text-emerald-600"></i>
+                </button>
+                <button onclick="scrollToSection('showcase-section')" class="w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-slate-50 flex items-center justify-between">
+                  <span>${t('nav.showcase')}</span><i data-lucide="file-check-2" class="w-4 h-4 text-teal-600"></i>
+                </button>
+                <button onclick="scrollToSection('sdgs-section')" class="w-full text-left px-3 py-2 rounded-md font-medium text-slate-700 hover:bg-slate-50">
+                  <span>${t('nav.sdgs')}</span>
+                </button>
+              </div>
+            ` : ''}
+          </header>
+        `;
+      }
+
+      function renderHero() {
+        return `
+          <div class="relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-900 to-navy-950 text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 relative z-10">
+              <div class="flex flex-wrap items-center justify-center gap-3 mb-6 text-center">
+                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 text-xs font-semibold tracking-wide">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-400"></i>
+                  <span>${t('hero.badge')}</span>
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700 text-slate-300 text-xs font-medium">
+                  <i data-lucide="award" class="w-3.5 h-3.5 text-amber-400"></i>
+                  <span>${t('hero.sub_badge')}</span>
+                </span>
+              </div>
+
+              <div class="text-center max-w-4xl mx-auto mb-12">
+                <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">${t('hero.title')}</h1>
+                <p class="mt-4 text-lg sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">${t('hero.subtitle')}</p>
+                <p class="mt-4 text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">${t('hero.desc')}</p>
+
+                <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <button onclick="scrollToSection('compliance-section')" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold text-base shadow-lg shadow-emerald-900/40 transition-all cursor-pointer">
+                    <i data-lucide="file-search" class="w-5 h-5"></i>
+                    <span>${t('hero.cta_checker')}</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                  </button>
+                  <button onclick="scrollToSection('showcase-section')" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 border border-slate-700 text-slate-200 font-semibold text-base transition-all cursor-pointer">
+                    <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i>
+                    <span>${t('hero.cta_showcase')}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-5xl mx-auto mb-16 p-4 sm:p-6 rounded-2xl bg-slate-800/60 backdrop-blur-sm border border-slate-700/80">
+                <div class="flex flex-col items-center justify-center p-3 text-center border-r border-slate-700/60">
+                  <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">${t('hero.stat1_title')}</span>
+                  <div class="mt-1 flex items-baseline gap-1">
+                    <span class="text-2xl sm:text-3xl font-extrabold text-white">${t('hero.stat1_val')}</span>
+                    <span class="text-xs text-emerald-400 font-bold">${t('hero.stat1_unit')}</span>
+                  </div>
+                  <span class="text-[11px] text-slate-400 mt-0.5">${t('hero.stat1_sub')}</span>
+                </div>
+                <div class="flex flex-col items-center justify-center p-3 text-center lg:border-r border-slate-700/60">
+                  <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">${t('hero.stat2_title')}</span>
+                  <div class="mt-1 flex items-baseline gap-1">
+                    <span class="text-2xl sm:text-3xl font-extrabold text-emerald-400">${t('hero.stat2_val')}</span>
+                    <span class="text-xs text-slate-300 font-bold">${t('hero.stat2_unit')}</span>
+                  </div>
+                  <span class="text-[11px] text-slate-400 mt-0.5">${t('hero.stat2_sub')}</span>
+                </div>
+                <div class="flex flex-col items-center justify-center p-3 text-center border-r border-slate-700/60">
+                  <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">${t('hero.stat3_title')}</span>
+                  <div class="mt-1 flex items-baseline gap-1">
+                    <span class="text-2xl sm:text-3xl font-extrabold text-amber-400">${t('hero.stat3_val')}</span>
+                  </div>
+                  <span class="text-[11px] text-slate-400 mt-0.5">${t('hero.stat3_sub')}</span>
+                </div>
+                <div class="flex flex-col items-center justify-center p-3 text-center">
+                  <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">${t('hero.stat4_title')}</span>
+                  <div class="mt-1 flex items-baseline gap-1">
+                    <span class="text-2xl sm:text-3xl font-extrabold text-teal-300">${t('hero.stat4_val')}</span>
+                    <span class="text-xs text-slate-300 font-bold">${t('hero.stat4_unit')}</span>
+                  </div>
+                  <span class="text-[11px] text-slate-400 mt-0.5">${t('hero.stat4_sub')}</span>
+                </div>
+              </div>
+
+              <div id="problem-section" class="pt-6">
+                <div class="text-center mb-8">
+                  <span class="text-xs font-bold text-amber-400 uppercase tracking-widest bg-amber-950/40 px-3 py-1 rounded-full border border-amber-500/30">${t('prob.badge')}</span>
+                  <h2 class="text-2xl sm:text-3xl font-bold text-white mt-3">${t('prob.title')}</h2>
+                  <p class="text-slate-400 text-sm max-w-xl mx-auto mt-2">${t('prob.desc')}</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                  <div class="bg-slate-800/80 rounded-2xl p-6 border border-slate-700/90 hover:border-amber-500/50 transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-5">
+                      <i data-lucide="alert-octagon" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">${t('prob.card1_badge')}</span>
+                    <h3 class="text-lg font-bold text-white mt-1 mb-2">${t('prob.card1_title')}</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">${t('prob.card1_desc')}</p>
+                    <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center gap-2 text-xs text-amber-300/90 font-medium">
+                      <span>지표:</span><span class="bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/30">UN SDG 12.4 유해물질 이전 금지</span>
+                    </div>
+                  </div>
+
+                  <div class="bg-slate-800/80 rounded-2xl p-6 border border-slate-700/90 hover:border-emerald-500/50 transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-5">
+                      <i data-lucide="wind" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">${t('prob.card2_badge')}</span>
+                    <h3 class="text-lg font-bold text-white mt-1 mb-2">${t('prob.card2_title')}</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">${t('prob.card2_desc')}</p>
+                    <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center gap-2 text-xs text-emerald-300/90 font-medium">
+                      <span>지표:</span><span class="bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">SDG 13 탄소누출 & SDG 3.9 대기질</span>
+                    </div>
+                  </div>
+
+                  <div class="bg-slate-800/80 rounded-2xl p-6 border border-slate-700/90 hover:border-teal-500/50 transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 mb-5">
+                      <i data-lucide="shield-alert" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs font-bold text-teal-400 uppercase tracking-wider">${t('prob.card3_badge')}</span>
+                    <h3 class="text-lg font-bold text-white mt-1 mb-2">${t('prob.card3_title')}</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">${t('prob.card3_desc')}</p>
+                    <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center gap-2 text-xs text-teal-300/90 font-medium">
+                      <span>해결 솔루션:</span><span class="bg-teal-950/60 px-2 py-0.5 rounded border border-teal-500/30">ClearExport 그린 패스포트</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderComplianceChecker() {
+        const selectedCountry = TARGET_COUNTRIES.find(c => c.id === state.targetCountryId) || TARGET_COUNTRIES[0];
+        const res = state.diagnosisResult;
+
+        const yearOptions = [
+          { id: '2021_after', label: state.lang === 'ko' ? '2021년 이후' : '2021 or newer', sub: state.lang === 'ko' ? '최신/신차급' : 'Near New' },
+          { id: '2016_2020', label: state.lang === 'ko' ? '2016~2020년' : '2016~2020', sub: state.lang === 'ko' ? '주력 수출 연식' : 'Main Volume' },
+          { id: '2011_2015', label: state.lang === 'ko' ? '2011~2015년' : '2011~2015', sub: state.lang === 'ko' ? '경계선/준노후' : 'Borderline' },
+          { id: '2010_before', label: state.lang === 'ko' ? '2010년 이전' : 'Before 2010', sub: state.lang === 'ko' ? '노후/고위험군' : 'High Risk' }
+        ];
+
+        const fuelOptions = [
+          { id: 'diesel', label: state.lang === 'ko' ? '경유 (디젤)' : 'Diesel', icon: '⛽' },
+          { id: 'gasoline', label: state.lang === 'ko' ? '휘발유 (가솔린)' : 'Gasoline', icon: '🚗' },
+          { id: 'lpg', label: state.lang === 'ko' ? 'LPG 액화가스' : 'LPG Gas', icon: '💨' },
+          { id: 'eco', label: state.lang === 'ko' ? '하이브리드 · 전기' : 'Hybrid / EV', icon: '⚡' }
+        ];
+
+        const gradeOptions = [
+          { grade: 1, label: state.lang === 'ko' ? '1~2등급' : 'Grade 1~2', desc: state.lang === 'ko' ? '초저공해·친환경' : 'Ultra Low Emission' },
+          { grade: 3, label: state.lang === 'ko' ? '3등급' : 'Grade 3', desc: state.lang === 'ko' ? 'EURO 5/6 준수' : 'EURO 5/6 Compliant' },
+          { grade: 4, label: state.lang === 'ko' ? '4등급' : 'Grade 4', desc: state.lang === 'ko' ? 'EURO 4 수준' : 'EURO 4 Standard' },
+          { grade: 5, label: state.lang === 'ko' ? '5등급 (노후경유차)' : 'Grade 5 (Aged)', desc: state.lang === 'ko' ? '단속·운행제한' : 'Restricted / Scrap' }
+        ];
+
+        const dpfOptions = [
+          {
+            id: 'installed_inspected',
+            title: state.lang === 'ko' ? 'DPF 장착 및 정기 종합검사 통과' : 'DPF Equipped & Inspected',
+            desc: state.lang === 'ko' ? '매연포집 필터 정상 작동, 차압 정상 범위, 최근 6개월 내 배출가스 검사 완료' : 'Particulate filter active, differential pressure normal, passed inspection'
+          },
+          {
+            id: 'stock_none',
+            title: state.lang === 'ko' ? 'DPF 미부착 (순정 상태 / 장치 없음)' : 'Stock / No DPF Installed',
+            desc: state.lang === 'ko' ? '저감장치가 장착되지 않았거나 순정 상태로 노후 분진 여과 기능 저하 우려' : 'No retrofit filter installed; high risk of particulate matter leakage'
+          },
+          {
+            id: 'unverified',
+            title: state.lang === 'ko' ? '정비 미확인 (Unverified Inspection)' : 'Unverified Maintenance Status',
+            desc: state.lang === 'ko' ? '인천항 야적장 단순 입고 차량으로 브레이크, 조향, DPF 무결성 미검사 상태' : 'Stored in yard without certified brake, steering, or emissions inspection'
+          }
+        ];
+
+        return `
+          <section id="compliance-section" class="py-20 bg-slate-50 border-t border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div class="text-center max-w-3xl mx-auto mb-14">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-3 border border-emerald-300">
+                  <i data-lucide="globe" class="w-3.5 h-3.5 text-emerald-700"></i>
+                  <span>${t('checker.badge')}</span>
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">${t('checker.title')}</h2>
+                <p class="mt-3 text-base text-slate-600 leading-relaxed">${t('checker.desc')}</p>
+
+                <div class="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-600">
+                  <span class="font-semibold text-slate-500">${t('checker.presets')}</span>
+                  <button onclick="applyPreset('cleanPorter')" class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-emerald-500 hover:text-emerald-700 transition-all cursor-pointer">${t('checker.preset1')}</button>
+                  <button onclick="applyPreset('agedDiesel')" class="px-2.5 py-1 rounded-lg bg-white border border-rose-200 text-rose-700 hover:bg-rose-50 transition-all cursor-pointer">${t('checker.preset2')}</button>
+                  <button onclick="applyPreset('ecoHybrid')" class="px-2.5 py-1 rounded-lg bg-white border border-emerald-200 text-emerald-700 hover:bg-emerald-50 transition-all cursor-pointer">${t('checker.preset3')}</button>
+                </div>
+              </div>
+
+              <div class="grid lg:grid-cols-12 gap-8 items-start">
+                <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/90">
+                  <div class="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
+                    <div class="flex items-center gap-2">
+                      <i data-lucide="sliders" class="w-5 h-5 text-emerald-600"></i>
+                      <h3 class="font-bold text-slate-900 text-lg">${t('checker.form_title')}</h3>
+                    </div>
+                    <span class="text-xs text-slate-400 font-medium">B2B Exporter Tool</span>
+                  </div>
+
+                  <div class="space-y-6">
+                    <div>
+                      <label class="block text-sm font-bold text-slate-800 mb-2 flex items-center justify-between">
+                        <span>${t('checker.year_label')}</span>
+                        <span class="text-xs font-normal text-slate-500">${t('checker.year_sub')}</span>
+                      </label>
+                      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        ${yearOptions.map(item => `
+                          <button type="button" onclick="updateForm('yearRange', '${item.id}')" class="p-3 rounded-xl border text-left transition-all cursor-pointer ${state.yearRange === item.id ? 'border-emerald-600 bg-emerald-50/80 text-emerald-950 ring-2 ring-emerald-500/20' : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'}">
+                            <div class="font-bold text-sm">${item.label}</div>
+                            <div class="text-[11px] text-slate-500 mt-0.5">${item.sub}</div>
+                          </button>
+                        `).join('')}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-sm font-bold text-slate-800 mb-2">${t('checker.fuel_label')}</label>
+                      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        ${fuelOptions.map(item => `
+                          <button type="button" onclick="updateForm('fuelType', '${item.id}')" class="p-3 rounded-xl border text-center transition-all cursor-pointer ${state.fuelType === item.id ? 'border-emerald-600 bg-emerald-50/80 text-emerald-950 font-bold ring-2 ring-emerald-500/20' : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'}">
+                            <div class="text-xl mb-1">${item.icon}</div>
+                            <div class="text-sm font-semibold">${item.label}</div>
+                          </button>
+                        `).join('')}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div class="flex items-center justify-between mb-2">
+                        <label class="text-sm font-bold text-slate-800">${t('checker.grade_label')}</label>
+                        <span class="text-xs text-slate-500">${t('checker.grade_sub')}</span>
+                      </div>
+                      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        ${gradeOptions.map(item => `
+                          <button type="button" onclick="updateForm('emissionGrade', ${item.grade})" class="p-3 rounded-xl border text-left transition-all cursor-pointer ${state.emissionGrade === item.grade ? (item.grade === 5 ? 'border-rose-600 bg-rose-50 text-rose-950 ring-2 ring-rose-500/20' : 'border-emerald-600 bg-emerald-50/80 text-emerald-950 ring-2 ring-emerald-500/20') : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'}">
+                            <div class="flex items-center justify-between">
+                              <span class="font-black text-sm">${item.label}</span>
+                              ${item.grade === 5 ? '<span class="text-xs">⚠️</span>' : ''}
+                            </div>
+                            <div class="text-[11px] text-slate-500 mt-0.5">${item.desc}</div>
+                          </button>
+                        `).join('')}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-sm font-bold text-slate-800 mb-2">${t('checker.dpf_label')}</label>
+                      <div class="space-y-2">
+                        ${dpfOptions.map(item => `
+                          <label onclick="updateForm('dpfStatus', '${item.id}')" class="flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${state.dpfStatus === item.id ? 'border-emerald-600 bg-emerald-50/50 ring-1 ring-emerald-500' : 'border-slate-200 hover:border-slate-300 bg-white'}">
+                            <input type="radio" name="dpfStatus" ${state.dpfStatus === item.id ? 'checked' : ''} class="mt-1 h-4 w-4 text-emerald-600" />
+                            <div>
+                              <div class="text-sm font-bold text-slate-900">${item.title}</div>
+                              <div class="text-xs text-slate-500 mt-0.5">${item.desc}</div>
+                            </div>
+                          </label>
+                        `).join('')}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-sm font-bold text-slate-800 mb-2">${t('checker.country_label')}</label>
+                      <select onchange="updateForm('targetCountryId', this.value)" class="w-full px-4 py-3.5 rounded-xl border border-slate-300 bg-white text-slate-900 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+                        ${TARGET_COUNTRIES.map(c => `
+                          <option value="${c.id}" ${state.targetCountryId === c.id ? 'selected' : ''}>
+                            ${c.flag} ${state.lang === 'ko' ? c.name : c.nameEn} — [${c.emissionStandard} / ${c.ageLimitText}]
+                          </option>
+                        `).join('')}
+                      </select>
+
+                      <div class="mt-3 p-3.5 rounded-xl bg-slate-100/80 border border-slate-200 text-xs text-slate-600 flex items-start gap-3">
+                        <span class="text-2xl">${selectedCountry.flag}</span>
+                        <div>
+                          <div class="font-bold text-slate-800 text-xs">${state.lang === 'ko' ? selectedCountry.name : selectedCountry.nameEn} ${state.lang === 'ko' ? '환경·수입 규제 가이드라인' : 'Environmental Regulations'}</div>
+                          <div class="text-slate-600 mt-1 leading-relaxed">${selectedCountry.description}</div>
+                          <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-300 font-semibold text-emerald-800">${state.lang === 'ko' ? '기준' : 'Standard'}: ${selectedCountry.emissionStandard}</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-300 font-semibold text-slate-700">${state.lang === 'ko' ? '연식' : 'Age Cap'}: ${selectedCountry.ageLimitText}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="pt-2">
+                      <button type="button" onclick="runDiagnosis()" class="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base shadow-md shadow-emerald-700/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                        <i data-lucide="shield-check" class="w-5 h-5"></i>
+                        <span>${t('checker.submit')}</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="diagnosis-result-anchor" class="lg:col-span-5 space-y-6">
+                  ${!res ? `
+                    <div class="bg-white rounded-3xl p-8 border border-slate-200/90 shadow-sm text-center flex flex-col items-center justify-center min-h-[500px]">
+                      <div class="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 mb-4">
+                        <i data-lucide="shield-check" class="w-8 h-8"></i>
+                      </div>
+                      <h3 class="text-xl font-bold text-slate-900">${state.lang === 'ko' ? '자가진단 대기 중' : 'Awaiting Input'}</h3>
+                      <p class="text-sm text-slate-500 max-w-xs mt-2 leading-relaxed">
+                        ${state.lang === 'ko' ? '왼쪽 양식에서 차량 스펙과 목표 수출국을 선택하고 [수출 적합성 진단하기] 버튼을 누르시면 3단계 종합 판정과 상세 ESG 리포트가 출력됩니다.' : 'Select vehicle specifications and target export destination on the left, then click [Evaluate Compliance Now] to generate the ESG report.'}
+                      </p>
+                    </div>
+                  ` : `
+                    <div class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-md fade-in">
+                      <div class="pb-5 border-b border-slate-100">
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">${state.lang === 'ko' ? '진단 결과 리포트' : 'Diagnosis Report'}</span>
+                          <span class="text-xs font-medium text-slate-500">${res.country.flag} ${state.lang === 'ko' ? res.country.name : res.country.nameEn}</span>
+                        </div>
+                        <div class="flex items-start gap-3 mt-2">
+                          <div class="p-2.5 rounded-2xl text-white shadow-sm ${res.status === 'PASS' ? 'bg-emerald-500' : res.status === 'CONDITIONAL' ? 'bg-amber-500' : 'bg-rose-500'}">
+                            <i data-lucide="${res.status === 'PASS' ? 'check-circle-2' : res.status === 'CONDITIONAL' ? 'alert-triangle' : 'alert-circle'}" class="w-7 h-7"></i>
+                          </div>
+                          <div>
+                            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold mb-1 border ${res.status === 'PASS' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : res.status === 'CONDITIONAL' ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-rose-50 text-rose-800 border-rose-200'}">
+                              ${res.status === 'PASS' ? '🟢 CLEAR TO EXPORT' : res.status === 'CONDITIONAL' ? '🟡 CONDITIONAL CLEARANCE' : '🔴 HIGH RISK WARNING'}
+                            </span>
+                            <h3 class="text-xl font-black text-slate-900 leading-snug">${state.lang === 'ko' ? res.statusTitle : res.statusTitleEn}</h3>
+                            <p class="text-xs text-slate-500 mt-0.5 font-medium">${state.lang === 'ko' ? res.statusTitleEn : res.statusTitle}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="my-5 p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                        <div class="flex items-center justify-between text-xs font-bold mb-2">
+                          <span class="text-slate-700">${state.lang === 'ko' ? '환경·안전 적합성 종합 점수' : 'Environmental & Safety Score'}</span>
+                          <span class="text-base font-black ${res.score >= 80 ? 'text-emerald-600' : res.score >= 50 ? 'text-amber-600' : 'text-rose-600'}">${res.score} / 100</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                          <div class="h-full rounded-full transition-all duration-700 ${res.score >= 80 ? 'bg-emerald-500' : res.score >= 50 ? 'bg-amber-500' : 'bg-rose-500'}" style="width: ${res.score}%"></div>
+                        </div>
+                      </div>
+
+                      <div class="mb-5">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">${state.lang === 'ko' ? '판정 종합 소견' : 'Executive Summary'}</h4>
+                        <p class="text-sm text-slate-800 leading-relaxed font-medium bg-slate-50/80 p-3.5 rounded-xl border border-slate-200/60">${state.lang === 'ko' ? res.summary : res.summaryEn}</p>
+                      </div>
+
+                      ${res.keyReasons.length > 0 ? `
+                        <div class="mb-5">
+                          <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">${state.lang === 'ko' ? '주요 감점 및 규제 저촉 사유' : 'Compliance Deductions & Risk Factors'}</h4>
+                          <ul class="space-y-1.5">
+                            ${res.keyReasons.map(r => `<li class="text-xs text-rose-700 bg-rose-50/70 p-2.5 rounded-lg border border-rose-200/60 flex items-start gap-2"><span class="text-rose-500 font-bold">•</span><span>${r}</span></li>`).join('')}
+                          </ul>
+                        </div>
+                      ` : ''}
+
+                      <div class="mb-5">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">${state.lang === 'ko' ? '수출자 및 바이어 권장 조치사항' : 'Action Plan for Exporters & Buyers'}</h4>
+                        <ul class="space-y-1.5">
+                          ${res.recommendations.map(r => `<li class="text-xs text-slate-700 bg-emerald-50/40 p-2.5 rounded-lg border border-emerald-200/60 flex items-start gap-2 font-medium"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i><span>${r}</span></li>`).join('')}
+                        </ul>
+                      </div>
+
+                      <div class="pt-2">
+                        <button onclick="openVirtualPassport()" class="w-full py-3.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow transition-all flex items-center justify-center gap-2 cursor-pointer">
+                          <i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i>
+                          <span>${t('checker.preview_passport')}</span>
+                          <i data-lucide="arrow-right" class="w-4 h-4 text-slate-400 ml-1"></i>
+                        </button>
+                        <p class="text-[11px] text-center text-slate-400 mt-2">${t('checker.preview_passport_desc')}</p>
+                      </div>
+                    </div>
+                  `}
+                </div>
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      function renderShowcase() {
+        const filtered = SAMPLE_VEHICLES.filter(v => {
+          if (state.activeCategory !== 'all' && v.category !== state.activeCategory) return false;
+          if (state.selectedCountryFilter !== 'all' && !v.recommendedCountries.includes(state.selectedCountryFilter)) return false;
+          if (state.searchQuery.trim() !== '') {
+            const q = state.searchQuery.toLowerCase();
+            return v.name.toLowerCase().includes(q) || v.nameEn.toLowerCase().includes(q) || v.vinMasked.toLowerCase().includes(q) || v.certNumber.toLowerCase().includes(q);
+          }
+          return true;
+        });
+
+        const tabs = [
+          { id: 'all', label: t('showcase.tab_all') },
+          { id: 'suv_sedan', label: t('showcase.tab_suv') },
+          { id: 'commercial', label: t('showcase.tab_comm') },
+          { id: 'eco', label: t('showcase.tab_eco') }
+        ];
+
+        return `
+          <section id="showcase-section" class="py-20 bg-white border-t border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div class="text-center max-w-3xl mx-auto mb-12">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-3 border border-emerald-300">
+                  <i data-lucide="award" class="w-3.5 h-3.5 text-emerald-700"></i>
+                  <span>${t('showcase.badge')}</span>
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">${t('showcase.title')}</h2>
+                <p class="mt-3 text-base text-slate-600 leading-relaxed">${t('showcase.desc')}</p>
+              </div>
+
+              <div class="bg-slate-50 p-4 rounded-3xl border border-slate-200/80 mb-10 space-y-4">
+                <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+                  <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                    ${tabs.map(tab => `
+                      <button onclick="setShowcaseCategory('${tab.id}')" class="px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${state.activeCategory === tab.id ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300'}">${tab.label}</button>
+                    `).join('')}
+                  </div>
+
+                  <div class="relative w-full lg:w-72">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" placeholder="${t('showcase.search_ph')}" value="${state.searchQuery}" oninput="setShowcaseSearch(this.value)" class="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white border border-slate-200 text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200/60 text-xs">
+                  <span class="font-bold text-slate-500 flex items-center gap-1">
+                    <i data-lucide="filter" class="w-3.5 h-3.5"></i><span>${t('showcase.country_filter')}</span>
+                  </span>
+                  <button onclick="setShowcaseCountry('all')" class="px-2.5 py-1 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${state.selectedCountryFilter === 'all' ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200'}">${t('showcase.all_countries')}</button>
+                  ${TARGET_COUNTRIES.map(c => `
+                    <button onclick="setShowcaseCountry('${c.id}')" class="px-2.5 py-1 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${state.selectedCountryFilter === c.id ? 'bg-emerald-700 text-white border-emerald-700' : 'bg-white text-slate-600 border-slate-200'}">
+                      ${c.flag} ${state.lang === 'ko' ? c.name.split(' ')[0] : c.nameEn.split(' ')[0]}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+
+              ${filtered.length === 0 ? `
+                <div class="text-center py-16 bg-slate-50 rounded-3xl border border-slate-200">
+                  <p class="text-slate-500 font-medium">${t('showcase.empty')}</p>
+                  <button onclick="resetShowcaseFilters()" class="mt-3 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold cursor-pointer">${t('showcase.reset_filter')}</button>
+                </div>
+              ` : `
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  ${filtered.map(v => `
+                    <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-2xs hover:shadow-xl hover:border-emerald-500/50 transition-all duration-300 flex flex-col group">
+                      <div class="relative h-48 bg-gradient-to-br from-slate-800 to-slate-900 overflow-hidden flex items-center justify-center">
+                        <img src="${v.imageUrl}" alt="${v.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <div style="display:none;" class="flex-col items-center justify-center text-slate-400 p-4 text-center">
+                          <i data-lucide="car" class="w-12 h-12 text-emerald-500/60 mb-2"></i>
+                          <span class="text-xs font-bold text-slate-300">${v.modelCode}</span>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none"></div>
+
+                        <div class="absolute top-3 left-3">
+                          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-600/90 text-white text-[10px] font-black tracking-wider uppercase shadow-sm">
+                            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i><span>K-Certified Green</span>
+                          </span>
+                        </div>
+
+                        <div class="absolute top-3 right-3">
+                          <span class="px-2.5 py-1 rounded-full text-[11px] font-black uppercase shadow-sm border ${v.emissionGrade <= 2 ? 'bg-emerald-100 text-emerald-900 border-emerald-300' : 'bg-blue-100 text-blue-900 border-blue-300'}">
+                            ${v.emissionGrade}${state.lang === 'ko' ? '등급' : ' Grade'}
+                          </span>
+                        </div>
+
+                        <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">
+                          <span class="font-bold text-sm">$${v.priceUsd.toLocaleString()} USD</span>
+                          <span class="text-[11px] bg-slate-900/70 px-2 py-0.5 rounded text-slate-300">${v.year} · ${v.mileageKm.toLocaleString()} km</span>
+                        </div>
+                      </div>
+
+                      <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                          <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono mb-1">
+                            <span>${v.modelCode}</span>
+                            <span class="text-emerald-700 font-bold">${v.certNumber}</span>
+                          </div>
+                          <h3 class="font-extrabold text-slate-900 text-base leading-snug group-hover:text-emerald-700 transition-colors">${state.lang === 'ko' ? v.name : v.nameEn}</h3>
+                          <p class="text-xs text-slate-500 font-medium truncate mt-0.5">${state.lang === 'ko' ? v.nameEn : v.name}</p>
+
+                          <div class="mt-3 flex flex-wrap gap-1.5 text-[11px]">
+                            <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">${state.lang === 'ko' ? v.fuelTypeName : v.fuelType.toUpperCase()}</span>
+                            ${v.hasDPF ? `<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200/80 font-semibold">${state.lang === 'ko' ? '✓ DPF 정상 작동' : '✓ DPF Verified'}</span>` : ''}
+                            <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">PM ${v.smokePM}%</span>
+                          </div>
+
+                          <div class="mt-3 pt-3 border-t border-slate-100">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">${state.lang === 'ko' ? '추천 수출 적합국' : 'Eligible Ports'}</span>
+                            <div class="flex flex-wrap gap-1">
+                              ${v.recommendedCountries.map(cId => {
+                                const c = TARGET_COUNTRIES.find(item => item.id === cId);
+                                return c ? `<span class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-medium"><span>${c.flag}</span><span>${state.lang === 'ko' ? c.name.split(' ')[0] : c.nameEn.split(' ')[0]}</span></span>` : '';
+                              }).join('')}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="mt-5 pt-3">
+                          <button onclick="openVehiclePassport('${v.id}')" class="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-emerald-600 text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
+                            <i data-lucide="eye" class="w-3.5 h-3.5 text-emerald-400"></i>
+                            <span>${t('showcase.view_passport')}</span>
+                            <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              `}
+            </div>
+          </section>
+        `;
+      }
+
+      function renderSdgsFooter() {
+        return `
+          <footer id="sdgs-section" class="bg-slate-900 text-white border-t border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
+              <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest bg-emerald-950 px-3 py-1 rounded-full border border-emerald-500/30">${t('sdgs.badge')}</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-3">${t('sdgs.title')}</h2>
+                <p class="text-sm text-slate-400 mt-2 leading-relaxed">${t('sdgs.desc')}</p>
+              </div>
+
+              <div class="grid md:grid-cols-3 gap-6">
+                ${SDG_DETAILS.map(sdg => `
+                  <div class="bg-slate-800/80 rounded-3xl p-6 border border-slate-700/80 hover:border-emerald-500/40 transition-all flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between mb-4">
+                        <div class="p-3 rounded-2xl ${sdg.color} text-white shadow-md">
+                          <i data-lucide="${sdg.icon}" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-black px-2.5 py-1 rounded-full bg-slate-700/80 text-slate-200 border border-slate-600">${sdg.sdgNum}</span>
+                      </div>
+                      <div class="text-xs font-bold text-emerald-400 mb-1">${sdg.target}</div>
+                      <h3 class="text-lg font-bold text-white mb-2">${state.lang === 'ko' ? sdg.name : sdg.nameEn}</h3>
+                      <p class="text-xs text-slate-300 leading-relaxed">${sdg.description}</p>
+                    </div>
+                    <div class="mt-5 pt-3 border-t border-slate-700/60">
+                      <span class="inline-flex items-center text-[11px] font-semibold text-emerald-300">✓ ${sdg.badge}</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+
+              <div class="mt-14 p-6 rounded-2xl bg-slate-800/40 border border-slate-700/60 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                  <h4 class="text-sm font-bold text-slate-200">${t('sdgs.collab_title')}</h4>
+                  <p class="text-xs text-slate-400 mt-1">${t('sdgs.collab_desc')}</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 text-xs text-slate-400">
+                  <span class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700">Incheon Port Trade</span>
+                  <span class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700">EAC EURO 4 Matrix</span>
+                  <span class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700">UNEP Used Car Guide</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="border-t border-slate-800 bg-slate-950 py-10 text-xs text-slate-400">
+              <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <span class="font-black text-white text-base tracking-tight">Clear<span class="text-emerald-500">Export</span></span>
+                    <span class="ml-2 text-[11px] text-slate-500">${state.lang === 'ko' ? '한국 수출 중고차 환경·안전 공익 검증 플랫폼' : 'Korea Used Vehicle Environmental & Safety Platform'}</span>
+                  </div>
+                </div>
+                <p class="text-slate-500 text-center md:text-right">© ${new Date().getFullYear()} ${t('sdgs.copyright')}</p>
+              </div>
+            </div>
+          </footer>
+        `;
+      }
+
+      function renderPassportModal() {
+        if (!state.selectedVehicle && !state.virtualPreviewData) return '';
+
+        const isVirtual = !!state.virtualPreviewData;
+        const v = state.selectedVehicle;
+        const vd = state.virtualPreviewData;
+
+        const certNumber = isVirtual ? vd.certNumber : v.certNumber;
+        const vehicleName = isVirtual
+          ? (state.lang === 'ko' ? `자가진단 가상 인증 매물 (${vd.specs.fuelType.toUpperCase()})` : `Virtual Diagnostic Simulation (${vd.specs.fuelType.toUpperCase()})`)
+          : (state.lang === 'ko' ? v.name : v.nameEn);
+        const vin = isVirtual ? 'KMH-SIMULATED-VIN-PREVIEW' : v.vinMasked;
+        const year = isVirtual ? (vd.specs.yearRange === '2021_after' ? 2022 : vd.specs.yearRange === '2016_2020' ? 2018 : 2013) : v.year;
+        const fuelName = isVirtual ? vd.specs.fuelType.toUpperCase() : (state.lang === 'ko' ? v.fuelTypeName : v.fuelType.toUpperCase());
+        const grade = isVirtual ? vd.specs.emissionGrade : v.emissionGrade;
+        const inspectionDate = isVirtual ? new Date().toISOString().split('T')[0] : v.inspectionDate;
+        const smokeVal = isVirtual ? (grade === 5 ? 28.5 : grade === 4 ? 14.2 : 5.8) : v.smokePM;
+        const noxVal = isVirtual ? (grade === 5 ? 0.95 : grade === 4 ? 0.48 : 0.22) : v.nox;
+
+        const safetyItems = [
+          { name: '브레이크 제동력 & 패드', result: '전륜 82% / 후륜 78% 잔여' },
+          { name: '조향 기어 및 휠 얼라인먼트', result: '편차 0.2° 이내 (정상)' },
+          { name: '타이어 트레드 깊이 및 편마모', result: '6.8mm 이상 (신품급)' },
+          { name: 'DPF 차압 및 고온 세척', result: '0.04 bar 차압 정상' },
+          { name: 'OBD-II 전자제어 결함코드', result: 'DTC 에러코드 0건' },
+          { name: '하부 프레임 관통 부식 여부', result: '관통 부식 없음 (방청 양호)' }
+        ];
+
+        return `
+          <div class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 fade-in">
+            <div class="relative bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200 my-8">
+              <div class="no-print bg-slate-900 px-6 py-4 flex items-center justify-between text-white border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400"></i>
+                  <span class="font-bold text-sm">${isVirtual ? t('modal.virtual_title') : t('modal.official_title')}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button onclick="openEvaluationModal('${certNumber}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold cursor-pointer">
+                    <i data-lucide="award" class="w-3.5 h-3.5"></i><span>${t('modal.view_eval')}</span>
+                  </button>
+                  <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i><span>${t('modal.print')}</span>
+                  </button>
+                  <button onclick="closePassportModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 ml-2 cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div id="printable-green-passport" class="p-6 sm:p-10 bg-white relative">
+                <div class="text-center pb-6 border-b-2 border-emerald-800/20">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="text-left">
+                      <span class="text-[10px] font-bold text-slate-400 uppercase block">REPUBLIC OF KOREA · EXPORT INTEGRITY</span>
+                      <span class="text-xs font-bold text-emerald-800">K-USED CAR GREEN PASSPORT INITIATIVE</span>
+                    </div>
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-900 font-extrabold text-xs">
+                      <i data-lucide="award" class="w-3.5 h-3.5 text-emerald-700"></i><span>CLEAREXPORT CERTIFIED</span>
+                    </div>
+                    <div class="text-right">
+                      <span class="text-[10px] font-bold text-slate-400 uppercase block">CERTIFICATE NO.</span>
+                      <span class="text-xs font-mono font-bold text-slate-900">${certNumber}</span>
+                    </div>
+                  </div>
+                  <h1 class="text-2xl sm:text-3xl font-black text-slate-950 mt-3">디지털 그린 패스포트 (Green Passport)</h1>
+                  <p class="text-xs sm:text-sm font-semibold text-emerald-700 tracking-widest uppercase mt-1">Used Vehicle Environmental & Safety Compliance Certificate</p>
+                </div>
+
+                <div class="grid sm:grid-cols-12 gap-6 my-6">
+                  <div class="sm:col-span-7 space-y-4">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                      <div class="text-xs font-bold text-slate-400 uppercase mb-2">차량 기본 제원 (Vehicle Identification)</div>
+                      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                        <div><span class="text-slate-400 block text-[11px]">차량명</span><span class="font-bold text-slate-900 text-sm">${vehicleName}</span></div>
+                        <div><span class="text-slate-400 block text-[11px]">제작연식</span><span class="font-bold text-slate-900 text-sm">${year}년형</span></div>
+                        <div><span class="text-slate-400 block text-[11px]">유종</span><span class="font-bold text-slate-900 text-sm">${fuelName}</span></div>
+                        <div><span class="text-slate-400 block text-[11px]">차대번호</span><span class="font-mono font-bold text-slate-900 text-xs">${vin}</span></div>
+                        <div><span class="text-slate-400 block text-[11px]">배출가스 등급</span><span class="font-black text-emerald-700 text-xs">${grade}등급</span></div>
+                        <div><span class="text-slate-400 block text-[11px]">검사일자</span><span class="font-bold text-slate-800 text-xs">${inspectionDate}</span></div>
+                      </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                      <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-slate-400 uppercase">배출가스 실측치 vs 수입국 허용기준</span>
+                        <span class="text-[11px] font-semibold text-emerald-700">인천항 정밀측정 완료</span>
+                      </div>
+                      <div class="space-y-3 text-xs">
+                        <div>
+                          <div class="flex justify-between mb-1">
+                            <span class="font-semibold text-slate-700">매연 / 미세입자 분진 (Smoke PM)</span>
+                            <span class="font-bold">측정치 <strong class="${smokeVal <= 15 ? 'text-emerald-600' : 'text-rose-600'}">${smokeVal}%</strong> / 기준 15%</span>
+                          </div>
+                          <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                            <div class="h-full rounded-full ${smokeVal <= 15 ? 'bg-emerald-500' : 'bg-rose-500'}" style="width: ${Math.min(100, (smokeVal / 15) * 100)}%"></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div class="flex justify-between mb-1">
+                            <span class="font-semibold text-slate-700">질소산화물 (NOx Index)</span>
+                            <span class="font-bold">측정치 <strong class="${noxVal <= 0.45 ? 'text-emerald-600' : 'text-rose-600'}">${noxVal} g/km</strong> / 기준 0.45 g/km</span>
+                          </div>
+                          <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                            <div class="h-full rounded-full ${noxVal <= 0.45 ? 'bg-emerald-500' : 'bg-rose-500'}" style="width: ${Math.min(100, (noxVal / 0.45) * 100)}%"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="sm:col-span-5 bg-gradient-to-b from-slate-900 to-emerald-950 text-white p-5 rounded-2xl flex flex-col items-center justify-between text-center border border-slate-700">
+                    <div class="w-full">
+                      <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest block">REAL SCANNING QR</span>
+                      <span class="text-xs font-bold text-slate-100 block mt-1">바이어 검증 및 실시간 평가기준 QR</span>
+                      <div class="my-3 p-3 bg-white rounded-2xl inline-block shadow-lg">
+                        <canvas id="passport-qr-canvas" class="w-36 h-36"></canvas>
+                      </div>
+                      <div class="no-print mt-2">
+                        <button onclick="openEvaluationModal('${certNumber}')" class="w-full py-2 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-300 font-extrabold text-xs cursor-pointer">
+                          ${t('modal.qr_open_eval')}
+                        </button>
+                      </div>
+                    </div>
+                    <div class="w-full pt-3 mt-3 border-t border-slate-700/80 text-[10px] text-emerald-400 font-mono">
+                      INCHEON PORT ESG AUTH · VERIFIED
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 my-6">
+                  <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-200">
+                    <span class="text-xs font-bold text-slate-700 uppercase">핵심 안전 주행계통 정밀 정비 점검표</span>
+                    <span class="text-[11px] font-bold text-emerald-700">전 항목 합격 (100% Pass)</span>
+                  </div>
+                  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                    ${safetyItems.map(item => `
+                      <div class="p-2.5 rounded-xl bg-white border border-slate-200 flex items-start justify-between">
+                        <div>
+                          <div class="font-bold text-slate-800 text-xs">${item.name}</div>
+                          <div class="text-[11px] text-slate-500 mt-0.5">${item.result}</div>
+                        </div>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">합격</span>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+
+              <div class="no-print bg-slate-100 px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+                <p class="text-xs text-slate-500">${t('modal.footer_note')}</p>
+                <button onclick="closePassportModal()" class="px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-xs cursor-pointer">${t('modal.close')}</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderEvaluationModal() {
+        if (!state.showEvaluationModal) return '';
+        return `
+          <div class="fixed inset-0 z-[60] overflow-y-auto bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 fade-in">
+            <div class="relative bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200 my-6 max-h-[92vh] flex flex-col">
+              <div class="bg-gradient-to-r from-emerald-800 to-slate-900 px-6 py-5 text-white flex items-center justify-between shrink-0">
+                <div>
+                  <span class="text-xs font-mono text-emerald-300">ID: ${state.evalCertNumber}</span>
+                  <h2 class="text-lg sm:text-xl font-black text-white mt-0.5">ClearExport 디지털 그린 패스포트 실시간 검증 & 평가 기준표</h2>
+                </div>
+                <button onclick="closeEvaluationModal()" class="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 cursor-pointer">
+                  <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+              </div>
+
+              <div class="overflow-y-auto p-6 sm:p-8 space-y-6 text-slate-800 text-xs">
+                <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
+                  <div>
+                    <h3 class="font-extrabold text-emerald-950 text-sm">공식 공인 인증 진위 확인 완료 (K-Registry Verified)</h3>
+                    <p class="text-emerald-800 mt-0.5">본 차량의 환경 배출 데이터와 안전 이력은 인천항 수출인증센터 종합전산망에 정식 등록되어 있습니다.</p>
+                  </div>
+                  <span class="px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold">VERIFIED</span>
+                </div>
+
+                <div class="overflow-x-auto rounded-2xl border border-slate-200">
+                  <table class="w-full text-left">
+                    <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                      <tr>
+                        <th class="p-3.5">평가 항목</th>
+                        <th class="p-3.5">공식 합격 판정 기준</th>
+                        <th class="p-3.5">판정</th>
+                        <th class="p-3.5">위반 시 위험 및 조치</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                      <tr>
+                        <td class="p-3.5 font-bold">매연 분진 (Smoke PM)</td>
+                        <td class="p-3.5">최대 15.0% 이하</td>
+                        <td class="p-3.5"><span class="px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800">합격 (Pass)</span></td>
+                        <td class="p-3.5 text-slate-600">초과 시 몽골·케냐 동절기 집중 단속 및 통관 보류</td>
+                      </tr>
+                      <tr>
+                        <td class="p-3.5 font-bold">질소산화물 (NOx)</td>
+                        <td class="p-3.5">0.40 g/km 이하 (EURO 5/6)</td>
+                        <td class="p-3.5"><span class="px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800">합격 (Pass)</span></td>
+                        <td class="p-3.5 text-slate-600">초과 시 EAC 규제 불합격 반송</td>
+                      </tr>
+                      <tr>
+                        <td class="p-3.5 font-bold">DPF 매연저감장치</td>
+                        <td class="p-3.5">차압 0.05 bar 이하 유지</td>
+                        <td class="p-3.5"><span class="px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800">합격 (Pass)</span></td>
+                        <td class="p-3.5 text-slate-600">DPF 탈거 차량은 칠레·케냐 반입 즉시 몰수</td>
+                      </tr>
+                      <tr>
+                        <td class="p-3.5 font-bold">브레이크 제동력 편차</td>
+                        <td class="p-3.5">좌우 제동 편차 8% 이내</td>
+                        <td class="p-3.5"><span class="px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800">합격 (Pass)</span></td>
+                        <td class="p-3.5 text-slate-600">고온 사막 지대 급제동 화재 사고 예방</td>
+                      </tr>
+                      <tr>
+                        <td class="p-3.5 font-bold">OBD-II 전자제어 진단</td>
+                        <td class="p-3.5">DTC 에러코드 0건</td>
+                        <td class="p-3.5"><span class="px-2 py-0.5 rounded font-bold bg-emerald-100 text-emerald-800">합격 (Pass)</span></td>
+                        <td class="p-3.5 text-slate-600">센서 오작동으로 인한 불완전 연소 차단</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="bg-slate-100 px-6 py-4 border-t border-slate-200 flex justify-end">
+                <button onclick="closeEvaluationModal()" class="px-5 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs cursor-pointer">닫기</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      window.setLanguage = function(lang) { state.lang = lang; localStorage.setItem('clearexport_lang', lang); renderApp(); };
+      window.toggleMobileMenu = function() { state.mobileMenuOpen = !state.mobileMenuOpen; renderApp(); };
+      window.scrollToSection = function(id) {
+        state.mobileMenuOpen = false; renderApp();
+        setTimeout(() => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 50);
+      };
+      window.updateForm = function(field, value) { state[field] = value; renderApp(); };
+      window.applyPreset = function(preset) {
+        if (preset === 'cleanPorter') {
+          state.yearRange = '2016_2020'; state.fuelType = 'diesel'; state.emissionGrade = 3;
+          state.dpfStatus = 'installed_inspected'; state.targetCountryId = 'mongolia';
+        } else if (preset === 'agedDiesel') {
+          state.yearRange = '2010_before'; state.fuelType = 'diesel'; state.emissionGrade = 5;
+          state.dpfStatus = 'stock_none'; state.targetCountryId = 'kenya_uganda';
+        } else {
+          state.yearRange = '2021_after'; state.fuelType = 'eco'; state.emissionGrade = 1;
+          state.dpfStatus = 'installed_inspected'; state.targetCountryId = 'chile';
+        }
+        state.diagnosisResult = null; renderApp();
+      };
+      window.runDiagnosis = function() {
+        state.diagnosisResult = evaluateCompliance({
+          yearRange: state.yearRange, fuelType: state.fuelType, emissionGrade: state.emissionGrade,
+          dpfStatus: state.dpfStatus, targetCountryId: state.targetCountryId
+        });
+        renderApp();
+        setTimeout(() => { const el = document.getElementById('diagnosis-result-anchor'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
+      };
+      window.setShowcaseCategory = function(cat) { state.activeCategory = cat; renderApp(); };
+      window.setShowcaseCountry = function(countryId) { state.selectedCountryFilter = countryId; renderApp(); };
+      window.setShowcaseSearch = function(val) { state.searchQuery = val; renderApp(); };
+      window.resetShowcaseFilters = function() { state.activeCategory = 'all'; state.selectedCountryFilter = 'all'; state.searchQuery = ''; renderApp(); };
+      window.openVehiclePassport = function(vehicleId) { state.virtualPreviewData = null; state.selectedVehicle = SAMPLE_VEHICLES.find(v => v.id === vehicleId) || null; renderApp(); };
+      window.openVirtualPassport = function() {
+        state.selectedVehicle = null;
+        const country = TARGET_COUNTRIES.find(c => c.id === state.targetCountryId) || TARGET_COUNTRIES[0];
+        state.virtualPreviewData = {
+          certNumber: `CE-VIRTUAL-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+          specs: { yearRange: state.yearRange, fuelType: state.fuelType, emissionGrade: state.emissionGrade, dpfStatus: state.dpfStatus },
+          country
+        };
+        renderApp();
+      };
+      window.closePassportModal = function() { state.selectedVehicle = null; state.virtualPreviewData = null; renderApp(); };
+      window.openEvaluationModal = function(certNum) { state.evalCertNumber = certNum; state.showEvaluationModal = true; renderApp(); };
+      window.closeEvaluationModal = function() { state.showEvaluationModal = false; renderApp(); };
+
+      function generateQRCodeOnCanvas() {
+        const canvas = document.getElementById('passport-qr-canvas');
+        if (!canvas || typeof QRCode === 'undefined') return;
+        const isVirtual = !!state.virtualPreviewData;
+        const v = state.selectedVehicle;
+        const vd = state.virtualPreviewData;
+        const certNumber = isVirtual ? vd.certNumber : v.certNumber;
+        const name = isVirtual ? `가상 시뮬레이션 (${vd.specs.fuelType})` : v.name;
+        const text = `[ClearExport K-인증서 진위확인]\n인증번호: ${certNumber}\n차종: ${name}\n발급처: 인천항 수출인증센터\n*공식 검증 완료`;
+        QRCode.toCanvas(canvas, text, { width: 144, margin: 1, color: { dark: '#0f172a', light: '#ffffff' } }, function(err) { if (err) console.error(err); });
+      }
+
+      function renderApp() {
+        const app = document.getElementById('app');
+        if (!app) return;
+        app.innerHTML = `
+          <div class="min-h-screen flex flex-col bg-slate-50 font-sans text-slate-800">
+            ${renderNavbar()}
+            <main class="flex-grow">
+              ${renderHero()}
+              ${renderComplianceChecker()}
+              ${renderShowcase()}
+            </main>
+            ${renderSdgsFooter()}
+            ${renderPassportModal()}
+            ${renderEvaluationModal()}
+          </div>
+        `;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        generateQRCodeOnCanvas();
+      }
+
+      document.addEventListener('DOMContentLoaded', renderApp);
+    </script>
+  </body>
+</html>
